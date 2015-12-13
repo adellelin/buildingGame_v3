@@ -117,7 +117,7 @@ function draw() {
     camera.zoom = 0.15
   } else if (zoomCount % 7 == 1 || zoomCount % 7 == 5) {
     camera.zoom = .4;
-    keyBoardMoves();
+    //keyBoardMoves();
 
   } else if (zoomCount % 7 == 2 || zoomCount % 7 == 4) {
     //camera.off();
@@ -288,11 +288,11 @@ function keyBoardMoves() {
   if (spr1.position.y < 900) {
     spr1.position.y = 900
   }
-  if (spr1.position.x > SCENE_W - 650) {
-    spr1.position.x = SCENE_W - 650
+  if (spr1.position.x > width - 650) {
+    spr1.position.x = width - 650
   }
-  if (spr1.position.y > SCENE_H - 850) {
-    spr1.position.y = SCENE_H - 850
+  if (spr1.position.y > height - 850) {
+    spr1.position.y = height - 850
   }
 }
 
