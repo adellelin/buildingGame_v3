@@ -1,6 +1,6 @@
 var spr1;
-var SCENE_W = 2000;
-var SCENE_H = 1200;
+var SCENE_W = 1500;
+var SCENE_H = 800;
 var frame;
 var scaleNo = 4;
 var zoomCount = 0;
@@ -13,7 +13,7 @@ var matchScore = 0;
 var tvSliderSpr;
 var tvSliderTrackSpr;
 var playButton;
-var m = 0;
+var buildingGr;
 var rows = 3;
 var col = 5;
 
@@ -141,8 +141,7 @@ function setup() {
   spr1 = createSprite(600, 300 / 2, 1, 1);
   //spr2 = createSprite(700, 180, 160, 90);
   pop();
-  MakeTvControls();
-  TvControls();
+
   cloudGr1 = new Group();
   cloudGr2 = new Group();
   cloudGr3 = new Group();
@@ -163,10 +162,17 @@ function setup() {
   //start.depth = 1;
   start.life = 90;
   
-  playInstructions = createSprite(screen.width/2, 300);
+  playInstructions = createSprite(screen.width/2, screen.height * 2/6);
   playInstructions.scale = .4;
   playInstructions.addImage(playSpr);
   //playInstructions.life = 20;
+  
+  buildingGr = new Group();
+  buildingGr.add(building);
+  buildingGr.add(start);
+  buildingGr.add(playInstructions);
+  MakeTvControls();
+  TvControls();
   
   // group1 will have 5 cloud1, 3 cloud2, 4 cloud4, 2 cloud6
   // group2 will have 3 cloud1, 5 cloud3, 3 cloud4, 1 cloud6
@@ -220,6 +226,7 @@ function setup() {
 
 function draw() {
   background(255, 100, 100);
+  drawSprites(buildingGr);
 
   // camera.off();
 
@@ -233,9 +240,7 @@ function draw() {
     camera.zoom = 0.4
   } else if (zoomCount % 2 == 1) {
     camera.zoom = 1;
-   
-   
- 
+
     //keyBoardMoves();
     for (var i = 0; i < col; i++) {
       for (var j = 0; j < rows; j++) {
@@ -309,7 +314,7 @@ function draw() {
           tvObjArray[i][j].glitchMatch = false;
         }
       }
-       drawSprites();
+       
       //change this depending on number of matching elements
       if (tvObjArray[arrCheckA[0][0]][arrCheckA[0][1]].glitchMatch === true 
       && tvObjArray[arrCheckA[1][0]][arrCheckA[1][1]].glitchMatch === true 
@@ -409,6 +414,11 @@ function draw() {
           sun.scale = 2
           sun.depth = 0;
         }
+      drawSprites(cloudGr1);
+      drawSprites(cloudGr2);
+      drawSprites(cloudGr3);
+      drawSprites(cloudGr4);
+      drawSprites(cloudGr5);
     }
   }
 }
@@ -433,7 +443,10 @@ function TvControls() {
   for (var i = 0; i < col; i++) {
     for (var j = 0; j < rows; j++) {
       // position the tv screens
-      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, screen.width * 1 / 12, 120);
+      // for larger screens
+      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, screen.width * 3/16, screen.height * 1/6);
+      // for smaller screens
+      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, building.width * 1.2, building.height * 1.2);
       tvObjArray[i][j].tv.loop();
       tvObjArray[i][j].tv.hide();
       tvObjArray[i][j].tv.pause();
@@ -444,11 +457,13 @@ function TvControls() {
       sliderTrackYpos = tvObjArray[i][j].ypos + 100 + j * 240;
       sliderYpos = tvObjArray[i][j].ypos + 100 + j * 240;
       playButtonYpos = tvObjArray[i][j].ypos + 100 + j * 240;
-
+      
+      // create sprite vars so they can be added to the building group
+      var ST, S, P;
       tvCtrlArray[i][j] = new MakeTvControls(
-        createSprite(sliderTrackXpos, sliderTrackYpos),
-        createSprite(sliderXpos, sliderYpos),
-        createSprite(playButtonXpos, playButtonYpos)
+        ST = createSprite(sliderTrackXpos, sliderTrackYpos),
+        S = createSprite(sliderXpos, sliderYpos),
+        P = createSprite(playButtonXpos, playButtonYpos)
       )
       tvCtrlArray[i][j].sliderTrack.scale = 1;
       tvCtrlArray[i][j].sliderTrack.addImage(tvSliderTrackSpr);
@@ -456,6 +471,9 @@ function TvControls() {
       tvCtrlArray[i][j].slider.addImage(tvSliderSpr);
       tvCtrlArray[i][j].playButton.scale = 1;
       tvCtrlArray[i][j].playButton.addImage(playButtonSpr);
+      buildingGr.add(ST);
+      buildingGr.add(S);
+      buildingGr.add(P);
     }
   }
 }
@@ -506,7 +524,7 @@ function keyPressed() {
 function cloudSpriteMotion() {
   for (var i = 0; i < cloudGr1.length; i++) {
     clouds1 = cloudGr1[i];
-    clouds1.scale = cloudScale;
+    clouds1.scale = cloudScale * 0.7;
     clouds1.attractionPoint(0.001 * i * (-1, 1), random(1800, 2100), random(300, 500));
     //clouds1.collide(building);
     //console.log(screen.height);
@@ -535,7 +553,7 @@ function cloudSpriteMotion() {
   }
   for (var i = 0; i < cloudGr5.length; i++) {
     clouds5 = cloudGr5[i];
-    clouds5.scale = cloudScale;
+    clouds5.scale = cloudScale * 0.7;
     clouds5.attractionPoint(0.001 * i * (-1, 1), random(-1000, 2200), random(600, 800));
     //clouds5.collide(building);
     //console.log(screen.height);
