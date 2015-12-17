@@ -43,6 +43,11 @@ var sunSpr;
 var playSpr;
 var playInstructions;
 
+var brickStartX = 0;
+var brickStartY = 22;
+var brickWidth = 40;
+var brickHeight = 15;
+
 var tvObjArray = [
   [],
   [],
@@ -58,28 +63,43 @@ var tvCtrlArray = [
   []
 ];
 
+var p = [
+  [],
+  [],
+  [],
+  [],
+  []
+];
+var q = [
+  [],
+  [],
+  [],
+  [],
+  []
+];
+
 var videoFiles = [
   ["videos/kittie1.mp4", "videos/TrumpB1.mp4", "videos/Trump1.mp4", "videos/Trump2.mp4", "videos/TrumpC1.mp4"],
-  ["videos/noise1.mp4", "videos/TrumpC1.mp4", "videos/TrumpB1.mp4", "videos/kittie2.mp4", "videos/noise3.mp4"],
-  ["videos/Trump3.mp4", "videos/kittie3.mp4", "videos/noise2.mp4", "videos/TrumpC1.mp4", "videos/TrumpB1.mp4"]
+  ["videos/noise1.mp4", "videos/TrumpC2.mp4", "videos/TrumpB2.mp4", "videos/kittie2.mp4", "videos/noise3.mp4"],
+  ["videos/Trump3.mp4", "videos/kittie3.mp4", "videos/noise2.mp4", "videos/TrumpC3.mp4", "videos/TrumpB3.mp4"]
 ];
 
 var timeArray = [
   [
-    [1, 3],[4, 6],[2, 3],[4, 6],[6, 8]
+    [1, 3],[10, 12],[8, 11],[4, 7],[12, 15]
   ],
   [
-    [1, 2],[3, 4],[2, 3],[4, 6],[2, 3]
+    [1, 2],[4, 7],[10, 13],[4, 6],[2, 3]
   ],
   [
-    [1, 2],[3, 4],[2, 3],[4, 6],[2, 3]
+    [4, 7],[3, 4],[2, 3],[7, 10],[2, 17]
   ]
 ];
 
 for (var i in timeArray) {
-  for (var j in timeArray) {
-    var p = timeArray[i][j][0];
-    var q = timeArray[i][j][1];
+  for (var j in timeArray[i]) {
+    p[j][i] = timeArray[i][j][0];
+    q[j][i] = timeArray[i][j][1];
   }
 }
 
@@ -109,7 +129,7 @@ for (i = 0; i < col; i++) {
     }
   }
 }
-console.log(arrCheckC);
+//console.log(arrCheckC);
 
 function preload() {
   //tvSliderSpr = loadImage("sprites/slider.png");
@@ -135,7 +155,7 @@ function preload() {
 function setup() {
   //camera.off();
   createCanvas(screen.width, screen.height);
-
+  console.log(p);
   push();
   noFill();
   spr1 = createSprite(600, 300 / 2, 1, 1);
@@ -161,19 +181,19 @@ function setup() {
   start.scale = 2;
   //start.depth = 1;
   start.life = 90;
-  
-  playInstructions = createSprite(screen.width/2, screen.height * 2/6);
+
+  playInstructions = createSprite(screen.width / 2, screen.height * 2 / 6);
   playInstructions.scale = .4;
   playInstructions.addImage(playSpr);
   //playInstructions.life = 20;
-  
+
   buildingGr = new Group();
   buildingGr.add(building);
   buildingGr.add(start);
   buildingGr.add(playInstructions);
   MakeTvControls();
   TvControls();
-  
+
   // group1 will have 5 cloud1, 3 cloud2, 4 cloud4, 2 cloud6
   // group2 will have 3 cloud1, 5 cloud3, 3 cloud4, 1 cloud6
   // group3 will have 2 cloud1, 5 cloud2, 2 cloud3, 1 cloud5
@@ -229,9 +249,6 @@ function draw() {
   drawSprites(buildingGr);
 
   // camera.off();
-
-  // cloud sprites
-
   //building.debug = mouseIsPressed;
   cloudSpriteMotion();
 
@@ -259,7 +276,7 @@ function draw() {
       //console.log(tvCtrlArray[3][1].playButton.position.x);
       //console.log(mouseX + camera.position.x - width / 2);
       if (tvCtrlArray[i][j].sliderTrack.mouseIsOver) {
-        
+
         //console.log("yes");
         // pause is used to make sure that when mouse goes to tune, 
         // the film stops until play is presesd
@@ -297,7 +314,7 @@ function draw() {
       tvObjArray[i][j].tv.loadPixels();
       if (puzzle[i][j] === "a") {
         //console.log(i + "and" + j);
-        if (tvObjArray[i][j].tv.time() > p && tvObjArray[i][j].tv.time() < q) {
+        if (tvObjArray[i][j].tv.time() > p[i][j] && tvObjArray[i][j].tv.time() < q[i][j]) {
           for (var y = 0; y < tvObjArray[i][j].tv.height; y += 8) {
             for (var x = 0; x < tvObjArray[i][j].tv.width; x += 4) {
               var offset = ((y * tvObjArray[i][j].tv.width) + x) * 4;
@@ -314,111 +331,117 @@ function draw() {
           tvObjArray[i][j].glitchMatch = false;
         }
       }
-       
+
       //change this depending on number of matching elements
-      if (tvObjArray[arrCheckA[0][0]][arrCheckA[0][1]].glitchMatch === true 
-      && tvObjArray[arrCheckA[1][0]][arrCheckA[1][1]].glitchMatch === true 
-      && tvObjArray[arrCheckA[2][0]][arrCheckA[2][1]].glitchMatch === true) {
+      if (tvObjArray[arrCheckA[0][0]][arrCheckA[0][1]].glitchMatch === true && tvObjArray[arrCheckA[1][0]][arrCheckA[1][1]].glitchMatch === true && tvObjArray[arrCheckA[2][0]][arrCheckA[2][1]].glitchMatch === true) {
 
         stroke(255, 150, 100);
         strokeWeight(1);
-        fill(255,100,100);
+        fill(255, 100, 100);
         clouds1.remove();
-         if(glitchSound.isPlaying() === false && playTest1 === 1){
-           glitchSound.play();
-           playTest1 -= 1;
-          } 
-        for (var k = 0; k < 14; k++){
-          ellipse(60 + k * 100, 60, 20, 20);
-          }
-          matchScore += 1;
-      }
-
-      if (puzzle[i][j] === "b") {
-        //console.log(i + "and" + j);
-        if (tvObjArray[i][j].tv.time() > p && tvObjArray[i][j].tv.time() < q) {
-          for (var y = 0; y < tvObjArray[i][j].tv.height; y += 8) {
-            for (var x = 0; x < tvObjArray[i][j].tv.width; x += 3) {
-              var offset = ((y * tvObjArray[i][j].tv.width) + x) * 1;
-              var sizeVal = tvObjArray[i][j].tv.pixels[offset] / 12;
-              var sizeVal2 = tvObjArray[i][j].tv.pixels[offset + 1] / 12;
-              noStroke();
-              fill(255, 255, random(0), 100);
-              ellipse(x + tvObjArray[i][j].xpos + i * videoOffsetX,
-                y + tvObjArray[i][j].ypos + j * videoOffsetY, sizeVal, sizeVal2);
-              tvObjArray[i][j].glitchMatch = true;
-            }
-          }
-        } else {
-          tvObjArray[i][j].glitchMatch = false;
+        if (glitchSound.isPlaying() === false && playTest1 === 1) {
+          glitchSound.play();
+          playTest1 -= 1;
         }
-      }
-      if (tvObjArray[arrCheckB[0][0]][arrCheckB[0][1]].glitchMatch === true 
-      && tvObjArray[arrCheckB[1][0]][arrCheckB[1][1]].glitchMatch === true 
-      && tvObjArray[arrCheckB[2][0]][arrCheckB[2][1]].glitchMatch === true) {
-
-        clouds2.remove();
-        clouds3.remove();
-        fill(100, 250, 150);
-        //ellipse(100, 100, 200, 200);
-          if(glitchSound.isPlaying() === false && playTest2 === 1){
-           glitchSound.play();
-           playTest2 -= 1;
-          } 
-        for (var k = 0; k < 14; k++){
-          ellipse(70 + k * 100, 300, 20, 20);
-          }
+        /*
+        for (var k = 0; k < 14; k++) {
+          ellipse(60 + k * 100, 60, 20, 20);
+        }*/
+        //ellipse(60 + k * 100, 60, 20, 20);
+        makeBricks(0);
         matchScore += 1;
       }
-      
-            if (puzzle[i][j] === "c") {
-        //console.log(i + "and" + j);
-        if (tvObjArray[i][j].tv.time() > p && tvObjArray[i][j].tv.time() < q) {
-          for (var y = 0; y < tvObjArray[i][j].tv.height; y += 8) {
-            for (var x = 0; x < tvObjArray[i][j].tv.width; x += 4) {
-              var offset = ((y * tvObjArray[i][j].tv.width) + x) * 2;
-              var sizeVal = tvObjArray[i][j].tv.pixels[offset] / 24;
-              var sizeVal2 = tvObjArray[i][j].tv.pixels[offset + 1] / 24;
-              noStroke();
-              fill(random(255), 255, random(255), 100);
-              ellipse(x + tvObjArray[i][j].xpos + i * videoOffsetX,
-                y + tvObjArray[i][j].ypos + j * videoOffsetY, sizeVal, sizeVal2);
-              tvObjArray[i][j].glitchMatch = true;
-            }
-          }
-        } else {
-          tvObjArray[i][j].glitchMatch = false;
-        }
-      }
-      if (tvObjArray[arrCheckC[0][0]][arrCheckC[0][1]].glitchMatch === true 
-      && tvObjArray[arrCheckC[1][0]][arrCheckC[1][1]].glitchMatch === true 
-      && tvObjArray[arrCheckC[2][0]][arrCheckC[2][1]].glitchMatch === true) {
+      //ellipse(60 + k * 100, 60, 20, 20);
 
-        clouds4.remove();
-        clouds5.remove();
-        fill(250, 100, 255);
-        //ellipse(100, 100, 200, 200);
-
-          if(glitchSound.isPlaying() === false && playTest3 === 1){
-           glitchSound.play();
-           playTest3 -= 1;
-          } 
-        for (var k = 0; k < 14; k++){
-          ellipse(70 + k * 100, 540, 20, 20);
+    if (puzzle[i][j] === "b") {
+      //console.log(i + "and" + j);
+      if (tvObjArray[i][j].tv.time() > p[i][j] && tvObjArray[i][j].tv.time() < q[i][j]) {
+        for (var y = 0; y < tvObjArray[i][j].tv.height; y += 8) {
+          for (var x = 0; x < tvObjArray[i][j].tv.width; x += 3) {
+            var offset = ((y * tvObjArray[i][j].tv.width) + x) * 1;
+            var sizeVal = tvObjArray[i][j].tv.pixels[offset] / 12;
+            var sizeVal2 = tvObjArray[i][j].tv.pixels[offset + 1] / 12;
+            noStroke();
+            fill(255, 255, random(0), 100);
+            ellipse(x + tvObjArray[i][j].xpos + i * videoOffsetX,
+              y + tvObjArray[i][j].ypos + j * videoOffsetY, sizeVal, sizeVal2);
+            tvObjArray[i][j].glitchMatch = true;
           }
-          matchScore += 1;
-      }
-        if (matchScore == 3){
-          sun = createSprite(-400, -200);
-          sun.addImage(sunSpr);
-          sun.scale = 2
-          sun.depth = 0;
         }
-      drawSprites(cloudGr1);
-      drawSprites(cloudGr2);
-      drawSprites(cloudGr3);
-      drawSprites(cloudGr4);
-      drawSprites(cloudGr5);
+      } else {
+        tvObjArray[i][j].glitchMatch = false;
+      }
+    }
+    if (tvObjArray[arrCheckB[0][0]][arrCheckB[0][1]].glitchMatch === true && tvObjArray[arrCheckB[1][0]][arrCheckB[1][1]].glitchMatch === true && tvObjArray[arrCheckB[2][0]][arrCheckB[2][1]].glitchMatch === true) {
+
+      clouds2.remove();
+      clouds3.remove();
+      fill(100, 250, 150);
+      //ellipse(100, 100, 200, 200);
+      if (glitchSound.isPlaying() === false && playTest2 === 1) {
+        glitchSound.play();
+        playTest2 -= 1;
+      }
+      playInstructions.remove();
+      /*
+      for (var k = 0; k < 14; k++) {
+        noStroke();
+        ellipse(70 + k * 100, 300, 20, 20);
+      }*/
+      makeBricks(240);
+      matchScore += 1;
+    }
+
+    if (puzzle[i][j] === "c") {
+      //console.log(i + "and" + j);
+      if (tvObjArray[i][j].tv.time() > p[i][j] && tvObjArray[i][j].tv.time() < q[i][j]) {
+        for (var y = 0; y < tvObjArray[i][j].tv.height; y += 8) {
+          for (var x = 0; x < tvObjArray[i][j].tv.width; x += 4) {
+            var offset = ((y * tvObjArray[i][j].tv.width) + x) * 2;
+            var sizeVal = tvObjArray[i][j].tv.pixels[offset] / 8;
+            var sizeVal2 = tvObjArray[i][j].tv.pixels[offset + 1] / 8;
+            noStroke();
+            fill(random(255), 255, random(255), 100);
+            ellipse(x + tvObjArray[i][j].xpos + i * videoOffsetX,
+              y + tvObjArray[i][j].ypos + j * videoOffsetY, sizeVal, sizeVal2);
+            tvObjArray[i][j].glitchMatch = true;
+          }
+        }
+      } else {
+        tvObjArray[i][j].glitchMatch = false;
+      }
+    }
+    if (tvObjArray[arrCheckC[0][0]][arrCheckC[0][1]].glitchMatch === true && tvObjArray[arrCheckC[1][0]][arrCheckC[1][1]].glitchMatch === true && tvObjArray[arrCheckC[2][0]][arrCheckC[2][1]].glitchMatch === true) {
+
+      clouds4.remove();
+      clouds5.remove();
+      fill(250, 100, 255);
+      //ellipse(100, 100, 200, 200);
+
+      if (glitchSound.isPlaying() === false && playTest3 === 1) {
+        glitchSound.play();
+        playTest3 -= 1;
+      }
+      /*
+      for (var k = 0; k < 14; k++) {
+        noStroke();
+        ellipse(70 + k * 100, 540, 20, 20);
+      }*/
+      makeBricks(480);
+      matchScore += 1;
+    }
+    if (matchScore == 3) {
+      sun = createSprite(-400, -200);
+      sun.addImage(sunSpr);
+      sun.scale = 2
+      sun.depth = 0;
+      buildingGr.add(sun);
+    }
+    drawSprites(cloudGr1);
+    drawSprites(cloudGr2);
+    drawSprites(cloudGr3);
+    drawSprites(cloudGr4);
+    drawSprites(cloudGr5);
     }
   }
 }
@@ -444,7 +467,7 @@ function TvControls() {
     for (var j = 0; j < rows; j++) {
       // position the tv screens
       // for larger screens
-      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, screen.width * 3/16, screen.height * 1/6);
+      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, screen.width * 3 / 16, screen.height * 1 / 6);
       // for smaller screens
       tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, building.width * 1.2, building.height * 1.2);
       tvObjArray[i][j].tv.loop();
@@ -457,7 +480,7 @@ function TvControls() {
       sliderTrackYpos = tvObjArray[i][j].ypos + 100 + j * 240;
       sliderYpos = tvObjArray[i][j].ypos + 100 + j * 240;
       playButtonYpos = tvObjArray[i][j].ypos + 100 + j * 240;
-      
+
       // create sprite vars so they can be added to the building group
       var ST, S, P;
       tvCtrlArray[i][j] = new MakeTvControls(
@@ -478,41 +501,7 @@ function TvControls() {
   }
 }
 
-function keyBoardMoves() {
-
-  if (keyIsDown(LEFT_ARROW)) {
-    spr1.position.x -= 10;
-  }
-  if (keyIsDown(RIGHT_ARROW)) {
-    spr1.position.x += 10;
-  }
-  if (keyIsDown(DOWN_ARROW)) {
-    spr1.position.y += 10;
-  }
-  if (keyIsDown(UP_ARROW)) {
-    spr1.position.y -= 10;
-  }
-
-  //set the camera position to the sprite position
-  camera.position.x = spr1.position.x;
-  camera.position.y = spr1.position.y;
-  // console.log(mouseX);
-
-  // setting boundaries
-  if (spr1.position.x < 350) {
-    spr1.position.x = 350
-  }
-  if (spr1.position.y < 900) {
-    spr1.position.y = 900
-  }
-  if (spr1.position.x > width - 650) {
-    spr1.position.x = width - 650
-  }
-  if (spr1.position.y > height - 850) {
-    spr1.position.y = height - 850
-  }
-}
-
+//zoom
 function keyPressed() {
   if (keyCode === 65) {
     zoomCount++;
@@ -557,5 +546,51 @@ function cloudSpriteMotion() {
     clouds5.attractionPoint(0.001 * i * (-1, 1), random(-1000, 2200), random(600, 800));
     //clouds5.collide(building);
     //console.log(screen.height);
+  }
+}
+
+function makeBricks(windowHeight){
+  for (var k = 0; k < 32; k += Math.floor(Math.random() * 10)) {
+    fill(255, 255, random(100));
+    stroke(random(6));
+    rect(brickStartX + k * 45, brickStartY + windowHeight, brickWidth, brickHeight);
+    rect(brickStartX + brickWidth / 2 + k * 45, brickStartY + brickHeight + 5 + windowHeight, brickWidth, brickHeight);
+    rect(brickStartX + k * 45, brickStartY + (brickHeight + 5) * 2 + windowHeight, brickWidth, brickHeight);
+    rect(brickStartX + brickWidth / 2 + k * 45, brickStartY + (brickHeight + 5) * 3 + windowHeight, brickWidth, brickHeight);
+  }
+}
+
+function keyBoardMoves() {
+
+  if (keyIsDown(LEFT_ARROW)) {
+    spr1.position.x -= 10;
+  }
+  if (keyIsDown(RIGHT_ARROW)) {
+    spr1.position.x += 10;
+  }
+  if (keyIsDown(DOWN_ARROW)) {
+    spr1.position.y += 10;
+  }
+  if (keyIsDown(UP_ARROW)) {
+    spr1.position.y -= 10;
+  }
+
+  //set the camera position to the sprite position
+  camera.position.x = spr1.position.x;
+  camera.position.y = spr1.position.y;
+  // console.log(mouseX);
+
+  // setting boundaries
+  if (spr1.position.x < 350) {
+    spr1.position.x = 350
+  }
+  if (spr1.position.y < 900) {
+    spr1.position.y = 900
+  }
+  if (spr1.position.x > width - 650) {
+    spr1.position.x = width - 650
+  }
+  if (spr1.position.y > height - 850) {
+    spr1.position.y = height - 850
   }
 }
