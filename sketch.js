@@ -8,7 +8,9 @@ var building;
 var playTest1 = 1;
 var playTest2 = 1;
 var playTest3 = 1;
-var matchScore = 0;
+var matchScoreA = 0;
+var matchScoreB = 0;
+var matchScoreC = 0;
 
 var tvSliderSpr;
 var tvSliderTrackSpr;
@@ -155,7 +157,6 @@ function preload() {
 function setup() {
   //camera.off();
   createCanvas(screen.width, screen.height);
-  console.log(p);
   push();
   noFill();
   spr1 = createSprite(600, 300 / 2, 1, 1);
@@ -295,8 +296,7 @@ function draw() {
         tvCtrlArray[i][j].slider.position.x = tvObjArray[i][j].xpos + i * (videoOffsetX) + 15 + playPos * tvCtrlArray[i][j].sliderTrack.width;
         //tvCtrlArray[i][j].slider.position.x = tvObjArray[i][j].xpos + i * (tvObjArray[i][j].tv.width)
       }
-      // console.log("slider" + tvObjArray[i][j].tv.width);
-      // console.log("play" + playPos);
+
       // play film on mouse button press
       if (tvCtrlArray[i][j].playButton.mouseIsPressed) {
         playInstructions.remove();
@@ -349,7 +349,7 @@ function draw() {
         }*/
         //ellipse(60 + k * 100, 60, 20, 20);
         makeBricks(0);
-        matchScore += 1;
+        matchScoreA = 1;
       }
       //ellipse(60 + k * 100, 60, 20, 20);
 
@@ -389,7 +389,7 @@ function draw() {
         ellipse(70 + k * 100, 300, 20, 20);
       }*/
       makeBricks(240);
-      matchScore += 1;
+      matchScoreB = 1;
     }
 
     if (puzzle[i][j] === "c") {
@@ -428,15 +428,15 @@ function draw() {
         ellipse(70 + k * 100, 540, 20, 20);
       }*/
       makeBricks(480);
-      matchScore += 1;
+      matchScoreC = 1;
     }
-    if (matchScore == 3) {
+    if (matchScoreA == 1 && matchScoreB == 1 && matchScoreC == 1) {
       sun = createSprite(-400, -200);
       sun.addImage(sunSpr);
       sun.scale = 2
       sun.depth = 0;
       buildingGr.add(sun);
-    }
+    } 
     drawSprites(cloudGr1);
     drawSprites(cloudGr2);
     drawSprites(cloudGr3);
@@ -466,11 +466,11 @@ function TvControls() {
   for (var i = 0; i < col; i++) {
     for (var j = 0; j < rows; j++) {
       // position the tv screens
-      // for larger screens
-      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, screen.width * 3 / 16, screen.height * 1 / 6);
-      // for smaller screens
-      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, building.width * 1.2, building.height * 1.2);
-      tvObjArray[i][j].tv.loop();
+      // for larger res screens
+      //tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, screen.width * 3 / 16, screen.height * 1 / 6);
+      
+      // for lower res screens
+      tvObjArray[i][j] = new NewTvObj(createVideo(videoFiles[j][i]), false, building.width * 1.2, building.height * 1.2);      tvObjArray[i][j].tv.loop();
       tvObjArray[i][j].tv.hide();
       tvObjArray[i][j].tv.pause();
 
@@ -481,7 +481,9 @@ function TvControls() {
       sliderYpos = tvObjArray[i][j].ypos + 100 + j * 240;
       playButtonYpos = tvObjArray[i][j].ypos + 100 + j * 240;
 
-      // create sprite vars so they can be added to the building group
+      // declare sprites variables so they can be added to the building group
+      // once added to the building group they can be drawn at the same time
+      // instantiate the TV control objects into an array
       var ST, S, P;
       tvCtrlArray[i][j] = new MakeTvControls(
         ST = createSprite(sliderTrackXpos, sliderTrackYpos),
